@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: radiocalico-web
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./data:/app/data
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    restart: unless-stopped
+    command: npm run dev

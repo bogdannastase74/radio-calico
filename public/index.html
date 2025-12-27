@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RadioCalico - Live Stream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+  <header class="header-nav">
+    <div class="logo-container">
+      <img src="RadioCalicoLogoTM.png" alt="Radio Calico Logo" class="logo">
+      <h1>Radio Calico</h1>
+    </div>
+  </header>
+
+  <div class="player-container">
+    <audio id="audioPlayer"></audio>
+
+    <div class="now-playing-section">
+      <div class="album-art-container">
+        <img id="albumArt" class="album-art" src="https://d3d4yli4hf5bmh.cloudfront.net/cover.jpg" alt="Album Cover">
+        <div class="year-badge" id="yearBadge">----</div>
+      </div>
+
+      <div class="track-details">
+        <div class="track-info">
+          <div class="track-artist" id="trackArtist">Loading artist...</div>
+          <div class="track-title" id="trackTitle">Loading title...</div>
+          <div class="track-album" id="trackAlbum">Album info...</div>
+          <div class="track-meta">
+            <span>Lossless quality: 16-bit FLAC</span><br>
+            <span>Sample rate: 44.1 kHz</span><br>
+            <span id="audioQualityText">Current audio quality</span>
+          </div>
+        </div>
+
+        <div class="rating-section">
+          <div class="rating-buttons">
+            <button id="thumbsUpBtn" class="rating-btn thumbs-up">
+              👍 <span class="rating-count" id="thumbsUpCount">0</span>
+            </button>
+            <button id="thumbsDownBtn" class="rating-btn thumbs-down">
+              👎 <span class="rating-count" id="thumbsDownCount">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="playPauseBtn" class="play-pause-btn">▶</button>
+          <div class="time-display" id="timeDisplay">0:00</div>
+          <div class="volume-control">
+            <label for="volumeSlider">🔊</label>
+            <input type="range" id="volumeSlider" min="0" max="100" value="70">
+            <span class="volume-value" id="volumeValue">70%</span>
+          </div>
+        </div>
+
+        <div id="status" class="status stopped">Ready to play</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="previous-tracks-section">
+    <div class="previous-tracks-content">
+      <div class="recently-played">
+        <h3>Previous tracks:</h3>
+        <ul class="track-list" id="recentlyPlayed">
+          <li class="track-item">Loading...</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
