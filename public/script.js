@@ -12,6 +12,8 @@ const trackTitle = document.getElementById('trackTitle');
 const trackArtist = document.getElementById('trackArtist');
 const trackAlbum = document.getElementById('trackAlbum');
 const audioQualityText = document.getElementById('audioQualityText');
+const sourceQuality = document.getElementById('sourceQuality');
+const sampleRate = document.getElementById('sampleRate');
 const yearBadge = document.getElementById('yearBadge');
 const recentlyPlayed = document.getElementById('recentlyPlayed');
 const albumArt = document.getElementById('albumArt');
@@ -200,6 +202,8 @@ async function updateMetadata() {
     // Update audio quality
     if (data.bit_depth && data.sample_rate) {
       const sampleRateKHz = (data.sample_rate / 1000).toFixed(1);
+      sourceQuality.textContent = `Lossless quality: ${data.bit_depth}-bit FLAC`;
+      sampleRate.textContent = `Sample rate: ${sampleRateKHz} kHz`;
       audioQualityText.textContent = `Playing at ${data.bit_depth}-bit / ${sampleRateKHz}kHz`;
     }
 
