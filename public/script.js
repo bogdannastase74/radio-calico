@@ -28,6 +28,8 @@ let hls = null;
 let isPlaying = false;
 let streamStartTime = 0;
 let currentSongId = '';
+let currentStreamQuality = 'Loading...';
+let sourceMetadataQuality = '';
 
 // Create browser fingerprint including IP address
 async function generateFingerprint() {
@@ -170,6 +172,17 @@ async function submitRating(rating) {
   }
 }
 
+// Update audio quality display based on detected stream quality
+function updateAudioQualityDisplay() {
+  if (currentStreamQuality !== 'Loading...') {
+    audioQualityText.textContent = `Current stream: ${currentStreamQuality}`;
+  } else if (sourceMetadataQuality) {
+    audioQualityText.textContent = `Source quality: ${sourceMetadataQuality}`;
+  } else {
+    audioQualityText.textContent = 'Current audio quality';
+  }
+}
+
 // Fetch and update metadata
 let lastTrackTitle = '';
 async function updateMetadata() {
@@ -199,12 +212,14 @@ async function updateMetadata() {
       await checkUserRating(currentSongId);
     }
 
-    // Update audio quality
+    // Update source audio quality metadata
     if (data.bit_depth && data.sample_rate) {
       const sampleRateKHz = (data.sample_rate / 1000).toFixed(1);
+      sourceMetadataQuality = `${data.bit_depth}-bit FLAC / ${sampleRateKHz} kHz`;
       sourceQuality.textContent = `Lossless quality: ${data.bit_depth}-bit FLAC`;
       sampleRate.textContent = `Sample rate: ${sampleRateKHz} kHz`;
-      audioQualityText.textContent = `Playing at ${data.bit_depth}-bit / ${sampleRateKHz}kHz`;
+      // Update display with current stream quality
+      updateAudioQualityDisplay();
     }
 
     // Update recently played
@@ -243,6 +258,41 @@ function initPlayer() {
     hls.on(Hls.Events.MANIFEST_PARSED, function() {
       console.log('Stream manifest loaded successfully');
       updateStatus('Ready to play', 'stopped');
+
+      // Log available quality levels
+      if (hls.levels && hls.levels.length > 0) {
+        console.log('Available quality levels:', hls.levels);
+      }
+    });
+
+    // Detect quality level changes
+    hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
+      const level = hls.levels[data.level];
+      if (level) {
+        console.log('Quality level switched:', level);
+
+        // Determine quality based on bitrate
+        // FLAC is typically much higher bitrate than MP3
+        // Assuming FLAC will be > 500 kbps and MP3 will be around 192 kbps
+        if (level.bitrate && level.bitrate > 500000) {
+          currentStreamQuality = '48 kHz FLAC/lossless';
+        } else if (level.bitrate) {
+          const kbps = Math.round(level.bitrate / 1000);
+          currentStreamQuality = `${kbps} kbps VBR MP3`;
+        } else {
+          // Fallback: try to detect from codec info
+          if (level.videoCodec || level.audioCodec) {
+            const codec = level.audioCodec || '';
+            if (codec.includes('flac')) {
+              currentStreamQuality = '48 kHz FLAC/lossless';
+            } else if (codec.includes('mp3') || codec.includes('mp4a')) {
+              currentStreamQuality = '192 kbps VBR MP3';
+            }
+          }
+        }
+
+        updateAudioQualityDisplay();
+      }
     });
 
     hls.on(Hls.Events.ERROR, function(event, data) {
