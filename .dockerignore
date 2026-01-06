@@ -1,8 +1,56 @@
+# Dependencies
 node_modules
 npm-debug.log
+yarn-error.log
+
+# Git
 .git
 .gitignore
+.github
+
+# Environment files
 .env
+.env.*
+
+# Database files (will be created at runtime)
 data/*.sqlite
 data/*.db
+
+# Documentation
 *.md
+!README.md
+
+# Tests
+tests/
+jest.config.js
+coverage/
+.nyc_output/
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker files (avoid recursion)
+Dockerfile
+Dockerfile.*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Style guide (reference material, not needed in container)
+RadioCalicoStyle/
