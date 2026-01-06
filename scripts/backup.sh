@@ -60,13 +60,17 @@ if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
         exit 1
     fi
 else
-    # Container is running, do a direct database copy
-    echo "Container is running. Copying database file..."
+    # Container is running, use SQLite backup command for consistency
+    echo "Container is running. Using SQLite backup command..."
 
     BACKUP_FILE="$BACKUP_DIR/database-${TIMESTAMP}.sqlite"
 
-    docker cp "${CONTAINER_NAME}:/app/data/database.sqlite" "$BACKUP_FILE" 2>/dev/null || {
-        echo -e "${YELLOW}Database file not found, trying alternative backup method...${NC}"
+    # Use sqlite3 .backup command to ensure consistency
+    # This properly handles WAL mode and active connections
+    docker exec "${CONTAINER_NAME}" sh -c "sqlite3 /app/data/database.sqlite '.backup /tmp/backup.sqlite'" 2>/dev/null && \
+    docker cp "${CONTAINER_NAME}:/tmp/backup.sqlite" "$BACKUP_FILE" && \
+    docker exec "${CONTAINER_NAME}" rm -f /tmp/backup.sqlite || {
+        echo -e "${YELLOW}SQLite backup failed, trying alternative backup method...${NC}"
 
         # Alternative: backup entire volume
         docker run --rm \
