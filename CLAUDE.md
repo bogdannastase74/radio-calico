@@ -70,30 +70,82 @@ radiocalico/
 │   └── RadioCalicoLogoTM.png  # Logo for web interface
 ├── data/
 │   └── database.sqlite        # SQLite database file
+├── scripts/                   # Deployment and maintenance scripts
+│   ├── deploy.sh              # Production deployment script
+│   ├── build.sh               # Docker image build script
+│   ├── backup.sh              # Database backup script
+│   └── README.md              # Scripts documentation
 ├── RadioCalicoStyle/
 │   ├── RadioCalicoLayout.png  # Layout design reference
 │   ├── RadioCalicoLogoTM.png  # Original logo file
 │   ├── RadioCalico_Style_Guide.txt  # Style guide documentation
 │   └── stream_URL.txt         # Stream URL configuration
-├── docker-compose.yml         # Docker Compose configuration
-├── Dockerfile                 # Docker container definition
+├── docker-compose.yml         # Development Docker Compose configuration
+├── docker-compose.production.yml  # Production Docker Compose configuration
+├── Dockerfile                 # Development Docker container definition
+├── Dockerfile.production      # Production Docker container definition (multi-stage)
+├── .dockerignore              # Docker build exclusions
 ├── package.json               # Node.js dependencies
 ├── CLAUDE.md                  # This file - Claude context
+├── DEPLOYMENT.md              # Production deployment guide
 └── README.md                  # Project documentation
 ```
 
 ## Development Commands
 
 ```bash
-# Start server
+# Start development server
 docker compose up -d
 
-# Stop server
+# Stop development server
 docker compose down
 
 # View logs
 docker compose logs -f
 
-# Rebuild
+# Rebuild development container
 docker compose up -d --build
 ```
+
+## Production Deployment
+
+### Quick Deploy
+```bash
+# Deploy to production (builds and starts)
+./scripts/deploy.sh
+
+# Or manually with docker-compose
+docker compose -f docker-compose.production.yml up -d --build
+```
+
+### Production Commands
+```bash
+# Build production image
+./scripts/build.sh
+
+# Deploy to production
+./scripts/deploy.sh
+
+# Create database backup
+./scripts/backup.sh
+
+# View production logs
+docker compose -f docker-compose.production.yml logs -f
+
+# Stop production
+docker compose -f docker-compose.production.yml down
+
+# Restart production
+docker compose -f docker-compose.production.yml restart
+```
+
+### Production Features
+- **Multi-stage Docker build** - Optimized image size (~150-200MB)
+- **Non-root user** - Runs as nodejs user (uid 1001) for security
+- **Health checks** - Built-in health monitoring
+- **Resource limits** - CPU and memory constraints
+- **Persistent data** - Volume-mounted SQLite database
+- **Automated backups** - Backup script with retention policy
+- **Production-ready** - No dev dependencies, optimized for deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for comprehensive deployment guide.

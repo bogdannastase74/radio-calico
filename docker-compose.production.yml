@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    image: radiocalico:latest
+    container_name: radiocalico-production
+    ports:
+      - "3000:3000"
+    volumes:
+      # Only mount data directory for persistence
+      - radiocalico-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: always
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    # Resource limits (adjust based on your needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  radiocalico-data:
+    driver: local
